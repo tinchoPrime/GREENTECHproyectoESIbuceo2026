@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CICLO - Login</title>
+</head>
+<body>
+  <h2>Iniciar sesión</h2>
+  <form id="form-login">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button type="submit">Ingresar</button>
+    <p id="mensaje"></p>
+  </form>
+  <a href="index.html">Volver</a>
+
+  <script>
+    document.getElementById('form-login').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var email = document.getElementById('email').value.trim();
+      var password = document.getElementById('password').value;
+      var mensaje = document.getElementById('mensaje');
+
+      try {
+        var r = await fetch('api_usuarios.php?action=login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password })
+        });
+        var d = await r.json();
+
+        if (d.success) {
+          sessionStorage.setItem('usuario', JSON.stringify(d.data));
+          window.location.href = d.data.rol === 'admin' ? 'admin.html' : 'usuario.html';
+        } else {
+          mensaje.textContent = d.message;
+        }
+      } catch (err) {
+        mensaje.textContent = 'Error de conexión.';
+      }
+    });
+  </script>
+</body>
+</html>

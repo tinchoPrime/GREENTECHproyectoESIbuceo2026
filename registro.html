@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CICLO - Registro</title>
+</head>
+<body>
+  <h2>Solicitar Registro</h2>
+  <form id="form-registro">
+    <input type="text" id="nombre" placeholder="Nombre">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Contraseña">
+    <select id="rol">
+      <option value="">-- Rol --</option>
+      <option value="vecino">Vecino</option>
+      <option value="cuadrilla">Cuadrilla</option>
+      <option value="operario">Operario</option>
+    </select>
+    <button type="submit">Enviar solicitud</button>
+    <p id="mensaje"></p>
+  </form>
+  <a href="index.html">Volver</a>
+
+  <script>
+    document.getElementById('form-registro').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var nombre = document.getElementById('nombre').value.trim();
+      var email = document.getElementById('email').value.trim();
+      var password = document.getElementById('password').value;
+      var rol = document.getElementById('rol').value;
+      var mensaje = document.getElementById('mensaje');
+
+      if (!rol) {
+        mensaje.textContent = 'Seleccioná un rol.';
+        return;
+      }
+
+      try {
+        var r = await fetch('api_usuarios.php?action=registro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre: nombre, email: email, password: password, rol: rol })
+        });
+        var d = await r.json();
+
+        if (d.success) {
+          mensaje.textContent = 'Solicitud enviada. Un administrador la aprobará.';
+          document.getElementById('form-registro').reset();
+        } else {
+          mensaje.textContent = d.message;
+        }
+      } catch (err) {
+        mensaje.textContent = 'Error de conexión.';
+      }
+    });
+  </script>
+</body>
+</html>
